@@ -6,9 +6,7 @@ import 'package:waterstone/utils/auth.dart';
 enum LoginStatusEnum { loggedIn, loggedOut, loading }
 
 class LoginStatus extends StatefulWidget {
-  const LoginStatus({super.key, required this.status});
-
-  final LoginStatusEnum status;
+  const LoginStatus({super.key});
 
   @override
   State<LoginStatus> createState() => _LoginStatusState();
@@ -36,48 +34,56 @@ class _LoginStatusState extends State<LoginStatus> {
     },
   };
 
-  @override
-  Widget build(BuildContext context) {
+  _buildStatusWidget(status) {
     return Card(
-      color: styles[widget.status]!['background'] as Color,
+      color: styles[status]!['background'] as Color,
       child: InkWell(
-        onTap: () async {
-          bool status = await checkLoginStatus();
-          if (!status) {
-            await getLoginTickets();
-          }
-        },
+        onTap: () {},
         child: Container(
           padding: EdgeInsets.all(16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 16,
             children:
-                widget.status != LoginStatusEnum.loading
-                    ? [
-                      Icon(
-                        styles[widget.status]!['icon'] as IconData,
-                        size: 24,
-                        color: styles[widget.status]!['color'] as Color,
-                      ),
-                      Text(
-                        styles[widget.status]!['text'] as String,
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: styles[widget.status]!['color'] as Color,
-                        ),
-                      ),
-                    ]
-                    : [
-                      SizedBox(
-                        width: 28,
-                        height: 28,
-                        child: CircularProgressIndicator(),
-                      ),
-                    ],
+            status != LoginStatusEnum.loading
+                ? [
+              Icon(
+                styles[status]!['icon'] as IconData,
+                size: 24,
+                color: styles[status]!['color'] as Color,
+              ),
+              Text(
+                styles[status]!['text'] as String,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: styles[status]!['color'] as Color,
+                ),
+              ),
+            ]
+                : [
+              SizedBox(
+                width: 28,
+                height: 28,
+                child: CircularProgressIndicator(),
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(future: checkLoginStatus(), builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.hasData) {
+          return _buildStatusWidget(snapshot.data! ? LoginStatusEnum.loggedIn : LoginStatusEnum.loggedOut);
+        } else if (snapshot.hasError) {
+          return _buildStatusWidget(LoginStatusEnum.loggedOut);
+        }
+      }
+      return _buildStatusWidget(LoginStatusEnum.loading);
+    });
   }
 }
