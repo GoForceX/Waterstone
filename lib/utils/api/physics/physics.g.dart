@@ -45,5 +45,26 @@ final getPhysicsExperimentRecordsProvider =
 // ignore: unused_element
 typedef GetPhysicsExperimentRecordsRef =
     AutoDisposeFutureProviderRef<List<PhysicsExperimentRecord>>;
+String _$getPhysicsExperimentScheduleHash() =>
+    r'b0c803984eefeafc55a87877d978e5efbbf9bacb';
+
+/// See also [getPhysicsExperimentSchedule].
+@ProviderFor(getPhysicsExperimentSchedule)
+final getPhysicsExperimentScheduleProvider =
+    AutoDisposeFutureProvider<List<PhysicsExperimentAppointment>>.internal(
+      getPhysicsExperimentSchedule,
+      name: r'getPhysicsExperimentScheduleProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$getPhysicsExperimentScheduleHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GetPhysicsExperimentScheduleRef =
+    AutoDisposeFutureProviderRef<List<PhysicsExperimentAppointment>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
