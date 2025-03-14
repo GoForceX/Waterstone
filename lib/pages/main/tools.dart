@@ -2,8 +2,20 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:waterstone/components/login_status.dart';
+import 'package:waterstone/main.gr.dart';
 
 import '../../utils/auth.dart';
+
+class ToolRoute {
+  const ToolRoute({required this.route, required this.title});
+
+  final PageRouteInfo route;
+  final String title;
+}
+
+final List<ToolRoute> toolRoutes = [
+  ToolRoute(route: PhysicsExperimentRoute(), title: '大学物理实验'),
+];
 
 @RoutePage()
 class ToolsPage extends ConsumerWidget {
@@ -29,14 +41,39 @@ class ToolsPage extends ConsumerWidget {
             return LoginStatus(status: LoginStatusEnum.loading);
           },
         ),
+        TextField(
+          decoration: InputDecoration(
+            labelText: "搜索",
+            prefixIcon: Icon(Icons.search),
+          ),
+        ),
         GridView.count(
           physics: NeverScrollableScrollPhysics(),
           crossAxisCount: 2,
           mainAxisSpacing: 10,
           crossAxisSpacing: 10,
+          childAspectRatio: 2,
           padding: EdgeInsets.all(10),
           shrinkWrap: true,
-          children: [Card(child: Text("114514"))],
+          children: [
+            for (var toolRoute in toolRoutes)
+              Card(
+                child: InkWell(
+                  onTap: () {
+                    AutoRouter.of(context).push(toolRoute.route);
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Center(
+                      child: Text(
+                        toolRoute.title,
+                        style: TextStyle(fontSize: 18),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+          ],
         ),
       ],
     );

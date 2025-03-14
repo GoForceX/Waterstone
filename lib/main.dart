@@ -61,6 +61,10 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: UserRoute.page, path: 'user'),
       ],
     ),
+    AutoRoute(
+      page: PhysicsExperimentRoute.page,
+      path: '/tools/physics_experiment',
+    ),
   ];
 }
 
@@ -86,6 +90,11 @@ class BaseSingleton {
       );
       dio.interceptors.add(CookieManager(cookieJar));
     });
+
+    dio
+      ..options.followRedirects = false
+      ..options.validateStatus =
+          (status) => status != null && status >= 200 && status < 400;
 
     dio.options.headers = commonHeaders;
     dio.httpClientAdapter = NativeAdapter();
