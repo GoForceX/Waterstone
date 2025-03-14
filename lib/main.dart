@@ -3,6 +3,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:native_dio_adapter/native_dio_adapter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -15,18 +16,19 @@ import 'constants.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await BaseSingleton.singleton.init();
-  runApp(MyApp());
+  runApp(ProviderScope(child: MyApp()));
 }
 
 Logger logger = Logger(
-    printer: PrettyPrinter(
-        methodCount: 5,
-        errorMethodCount: 8,
-        lineLength: 120 * 10,
-        colors: true,
-        printEmojis: true,
-        dateTimeFormat: DateTimeFormat.dateAndTime
-        ));
+  printer: PrettyPrinter(
+    methodCount: 5,
+    errorMethodCount: 8,
+    lineLength: 120 * 10,
+    colors: true,
+    printEmojis: true,
+    dateTimeFormat: DateTimeFormat.dateAndTime,
+  ),
+);
 
 class MyApp extends StatelessWidget {
   MyApp({super.key});
@@ -49,13 +51,16 @@ class MyApp extends StatelessWidget {
 
 @AutoRouterConfig(replaceInRouteName: 'Screen|Page,Route')
 class AppRouter extends RootStackRouter {
-
   @override
   List<AutoRoute> get routes => [
-    AutoRoute(page: MainRoute.page, path: '/', children: [
-      AutoRoute(page: ToolsRoute.page, path: 'tools'),
-      AutoRoute(page: UserRoute.page, path: 'user'),
-    ]),
+    AutoRoute(
+      page: MainRoute.page,
+      path: '/',
+      children: [
+        AutoRoute(page: ToolsRoute.page, path: 'tools'),
+        AutoRoute(page: UserRoute.page, path: 'user'),
+      ],
+    ),
   ];
 }
 
@@ -76,10 +81,9 @@ class BaseSingleton {
     getApplicationSupportDirectory().then((value) {
       String dataPath = value.path;
       cookieJar = PersistCookieJar(
-          storage: FileStorage(
-            dataPath,
-          ),
-          ignoreExpires: true);
+        storage: FileStorage(dataPath),
+        ignoreExpires: true,
+      );
       dio.interceptors.add(CookieManager(cookieJar));
     });
 

@@ -1,19 +1,21 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:waterstone/utils/auth.dart';
 
 enum LoginStatusEnum { loggedIn, loggedOut, loading }
 
-class LoginStatus extends StatefulWidget {
-  const LoginStatus({super.key});
+class LoginStatus extends ConsumerStatefulWidget {
+  const LoginStatus({super.key, this.status, this.onLongPress});
+
+  final LoginStatusEnum? status;
+  final Function()? onLongPress;
 
   @override
-  State<LoginStatus> createState() => _LoginStatusState();
+  ConsumerState createState() => _LoginStatusState();
 }
 
-class _LoginStatusState extends State<LoginStatus> {
-  var styles = {
+class _LoginStatusState extends ConsumerState<LoginStatus> {
+  final styles = {
     LoginStatusEnum.loggedIn: {
       'icon': Icons.check_circle,
       'color': Colors.green,
@@ -34,39 +36,44 @@ class _LoginStatusState extends State<LoginStatus> {
     },
   };
 
-  _buildStatusWidget(status) {
+  _buildStatusWidget(LoginStatusEnum status, WidgetRef ref) {
     return Card(
+      elevation: 0,
+      margin: EdgeInsets.all(10),
       color: styles[status]!['background'] as Color,
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          ref.invalidate(checkLoginStatusProvider);
+        },
+        onLongPress: widget.onLongPress,
         child: Container(
           padding: EdgeInsets.all(16),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             spacing: 16,
             children:
-            status != LoginStatusEnum.loading
-                ? [
-              Icon(
-                styles[status]!['icon'] as IconData,
-                size: 24,
-                color: styles[status]!['color'] as Color,
-              ),
-              Text(
-                styles[status]!['text'] as String,
-                style: TextStyle(
-                  fontSize: 20,
-                  color: styles[status]!['color'] as Color,
-                ),
-              ),
-            ]
-                : [
-              SizedBox(
-                width: 28,
-                height: 28,
-                child: CircularProgressIndicator(),
-              ),
-            ],
+                status != LoginStatusEnum.loading
+                    ? [
+                      Icon(
+                        styles[status]!['icon'] as IconData,
+                        size: 24,
+                        color: styles[status]!['color'] as Color,
+                      ),
+                      Text(
+                        styles[status]!['text'] as String,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: styles[status]!['color'] as Color,
+                        ),
+                      ),
+                    ]
+                    : [
+                      SizedBox(
+                        width: 29,
+                        height: 29,
+                        child: CircularProgressIndicator(),
+                      ),
+                    ],
           ),
         ),
       ),
@@ -75,15 +82,23 @@ class _LoginStatusState extends State<LoginStatus> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(future: checkLoginStatus(), builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-      if (snapshot.connectionState == ConnectionState.done) {
-        if (snapshot.hasData) {
-          return _buildStatusWidget(snapshot.data! ? LoginStatusEnum.loggedIn : LoginStatusEnum.loggedOut);
-        } else if (snapshot.hasError) {
-          return _buildStatusWidget(LoginStatusEnum.loggedOut);
-        }
-      }
-      return _buildStatusWidget(LoginStatusEnum.loading);
-    });
+    if (widget.status != null) {
+      return _buildStatusWidget(widget.status!, ref);
+    }
+    AsyncValue loginStatus = ref.watch(checkLoginStatusProvider);
+    return loginStatus.when(
+      data: (data) {
+        return _buildStatusWidget(
+          data ? LoginStatusEnum.loggedIn : LoginStatusEnum.loggedOut,
+          ref,
+        );
+      },
+      error: (err, stacktrace) {
+        return Container();
+      },
+      loading: () {
+        return Center(child: CircularProgressIndicator());
+      },
+    );
   }
 }
