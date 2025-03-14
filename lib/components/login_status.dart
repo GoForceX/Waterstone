@@ -5,9 +5,9 @@ import 'package:waterstone/utils/auth.dart';
 enum LoginStatusEnum { loggedIn, loggedOut, loading }
 
 class LoginStatus extends ConsumerStatefulWidget {
-  const LoginStatus({super.key, this.status, this.onLongPress});
+  const LoginStatus({super.key, required this.status, this.onLongPress});
 
-  final LoginStatusEnum? status;
+  final LoginStatusEnum status;
   final Function()? onLongPress;
 
   @override
@@ -82,23 +82,6 @@ class _LoginStatusState extends ConsumerState<LoginStatus> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.status != null) {
-      return _buildStatusWidget(widget.status!, ref);
-    }
-    AsyncValue loginStatus = ref.watch(checkLoginStatusProvider);
-    return loginStatus.when(
-      data: (data) {
-        return _buildStatusWidget(
-          data ? LoginStatusEnum.loggedIn : LoginStatusEnum.loggedOut,
-          ref,
-        );
-      },
-      error: (err, stacktrace) {
-        return Container();
-      },
-      loading: () {
-        return Center(child: CircularProgressIndicator());
-      },
-    );
+    return _buildStatusWidget(widget.status, ref);
   }
 }

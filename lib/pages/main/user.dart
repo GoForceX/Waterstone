@@ -13,6 +13,12 @@ import '../../main.dart';
 class UserPage extends ConsumerWidget {
   const UserPage({super.key});
 
+  _invalidateCredentials(WidgetRef ref) {
+    BaseSingleton.singleton.cookieJar.deleteAll();
+    ref.invalidate(checkLoginStatusProvider);
+    ref.invalidate(getLoginTicketsProvider);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     AsyncValue status = ref.watch(checkLoginStatusProvider);
@@ -22,11 +28,33 @@ class UserPage extends ConsumerWidget {
       appBar: AppBar(title: Text('我的')),
       body: ListView(
         children: [
-          LoginStatus(
-            onLongPress: () {
-              BaseSingleton.singleton.cookieJar.deleteAll();
-              ref.invalidate(checkLoginStatusProvider);
-              ref.invalidate(getLoginTicketsProvider);
+          status.when(
+            data: (data) {
+              if (data) {
+                return LoginStatus(
+                  status: LoginStatusEnum.loggedIn,
+                  onLongPress: () {
+                    _invalidateCredentials(ref);
+                  },
+                );
+              }
+              return LoginStatus(
+                status: LoginStatusEnum.loggedOut,
+                onLongPress: () {
+                  _invalidateCredentials(ref);
+                },
+              );
+            },
+            error: (error, stack) {
+              return LoginStatus(
+                status: LoginStatusEnum.loading,
+                onLongPress: () {
+                  _invalidateCredentials(ref);
+                },
+              );
+            },
+            loading: () {
+              return LoginStatus(status: LoginStatusEnum.loading);
             },
           ),
           status.when(
@@ -48,8 +76,6 @@ class UserPage extends ConsumerWidget {
             error: (error, stack) => Container(),
             loading: () => Center(child: CircularProgressIndicator()),
           ),
-          ListTile(title: Text('个人信息'), onTap: () {}),
-          ListTile(title: Text('设置'), onTap: () {}),
         ],
       ),
     );
@@ -66,6 +92,7 @@ class LoginForm extends HookConsumerWidget {
     final TextEditingController usernameController = useTextEditingController();
     final TextEditingController passwordController = useTextEditingController();
     final TextEditingController codeController = useTextEditingController();
+    UniqueKey codeKey = UniqueKey();
 
     return Card(
       margin: EdgeInsets.all(10),
@@ -110,6 +137,7 @@ class LoginForm extends HookConsumerWidget {
                   ),
                 ),
                 RefreshableImage(
+                  key: codeKey,
                   src: "https://pass.hust.edu.cn/cas/code",
                   width: 90,
                   height: 58,
