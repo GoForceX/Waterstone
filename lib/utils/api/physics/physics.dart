@@ -6,30 +6,14 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:waterstone/utils/api/physics/schema.dart';
 
 import '../../../main.dart';
-import '../../net.dart';
+import '../prefetch.dart';
 
 part 'physics.g.dart';
 
 @riverpod
-Future<bool> prefetchPhysicsExperimentSession(Ref ref) async {
-  Dio dio = BaseSingleton.singleton.dio;
-  Response resp = await dio.get(
-    "http://empxk.hust.edu.cn/weixin/index",
-    options: Options(validateStatus: (statusCode) => true),
-  );
-  resp = await followRedirects(resp);
-  if (resp.realUri.toString().startsWith("http://empxk.hust.edu.cn")) {
-    return true;
-  }
-  return false;
-}
-
-@riverpod
-Future<List<PhysicsExperimentRecord>> getPhysicsExperimentRecords(
-  Ref ref,
-) async {
+Future<List<PhysicsExperimentRecord>> physicsExperimentRecords(Ref ref) async {
   bool sessionStatus = await ref.watch(
-    prefetchPhysicsExperimentSessionProvider.future,
+    physicsExperimentSessionStatusProvider.future,
   );
   if (!sessionStatus) {
     throw Exception("Failed to get physics experiment records");
@@ -51,11 +35,11 @@ Future<List<PhysicsExperimentRecord>> getPhysicsExperimentRecords(
 }
 
 @riverpod
-Future<List<PhysicsExperimentAppointment>> getPhysicsExperimentSchedule(
+Future<List<PhysicsExperimentAppointment>> physicsExperimentSchedule(
   Ref ref,
 ) async {
   bool sessionStatus = await ref.watch(
-    prefetchPhysicsExperimentSessionProvider.future,
+    physicsExperimentSessionStatusProvider.future,
   );
   if (!sessionStatus) {
     throw Exception("Failed to get physics schedules");

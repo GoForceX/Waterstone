@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:waterstone/components/login_status.dart';
 import 'package:waterstone/main.gr.dart';
 
-import '../../utils/auth.dart';
+import '../../utils/api/auth.dart';
 
 class ToolRoute {
   const ToolRoute({required this.route, required this.title});
@@ -23,7 +23,7 @@ class ToolsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue loginStatus = ref.watch(checkLoginStatusProvider);
+    AsyncValue loginStatus = ref.watch(loginStatusProvider);
 
     return ListView(
       children: [

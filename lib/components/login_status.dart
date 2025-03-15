@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:waterstone/utils/auth.dart';
+import 'package:waterstone/utils/api/auth.dart';
 
 enum LoginStatusEnum { loggedIn, loggedOut, loading }
 
@@ -43,7 +43,7 @@ class _LoginStatusState extends ConsumerState<LoginStatus> {
       color: styles[status]!['background'] as Color,
       child: InkWell(
         onTap: () {
-          ref.invalidate(checkLoginStatusProvider);
+          ref.invalidate(loginStatusProvider);
         },
         onLongPress: widget.onLongPress,
         child: Container(
