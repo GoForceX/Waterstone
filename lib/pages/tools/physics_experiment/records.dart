@@ -6,6 +6,7 @@ import 'package:waterstone/main.dart';
 import 'package:waterstone/utils/api/physics/physics.dart';
 
 import '../../../utils/api/physics/schema.dart';
+import '../../../utils/api/prefetch.dart';
 
 @RoutePage()
 class PhysicsExperimentRecordsPage extends ConsumerWidget {
@@ -28,7 +29,7 @@ class PhysicsExperimentRecordsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue records = ref.watch(getPhysicsExperimentRecordsProvider);
+    AsyncValue records = ref.watch(physicsExperimentRecordsProvider);
     return Scaffold(
       body: records.when(
         data: (data) {
@@ -53,8 +54,8 @@ class PhysicsExperimentRecordsPage extends ConsumerWidget {
                 const Text('获取实验列表失败', style: TextStyle(fontSize: 16)),
                 TextButton(
                   onPressed: () {
-                    ref.invalidate(prefetchPhysicsExperimentSessionProvider);
-                    ref.invalidate(getPhysicsExperimentRecordsProvider);
+                    ref.invalidate(physicsExperimentSessionStatusProvider);
+                    ref.invalidate(physicsExperimentRecordsProvider);
                   },
                   child: const Text('重试'),
                 ),

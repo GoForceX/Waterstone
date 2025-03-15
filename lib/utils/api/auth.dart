@@ -17,7 +17,7 @@ class LoginTickets {
 }
 
 @riverpod
-Future<bool> checkLoginStatus(Ref ref) async {
+Future<bool> loginStatus(Ref ref) async {
   Dio dio = BaseSingleton.singleton.dio;
   logger.i("114514, checking");
   Response resp = await dio.get(
@@ -35,8 +35,8 @@ Future<bool> checkLoginStatus(Ref ref) async {
 }
 
 @riverpod
-Future<LoginTickets?> getLoginTickets(Ref ref) async {
-  bool status = await ref.refresh(checkLoginStatusProvider.future);
+Future<LoginTickets?> loginTickets(Ref ref) async {
+  bool status = await ref.refresh(loginStatusProvider.future);
   if (status) {
     return null;
   }

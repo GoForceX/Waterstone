@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:waterstone/components/login_status.dart';
-import 'package:waterstone/utils/auth.dart';
+import 'package:waterstone/utils/api/auth.dart';
 
 import '../../components/refreshable_image.dart';
 import '../../main.dart';
@@ -15,14 +15,14 @@ class UserPage extends ConsumerWidget {
 
   _invalidateCredentials(WidgetRef ref) {
     BaseSingleton.singleton.cookieJar.deleteAll();
-    ref.invalidate(checkLoginStatusProvider);
-    ref.invalidate(getLoginTicketsProvider);
+    ref.invalidate(loginStatusProvider);
+    ref.invalidate(loginTicketsProvider);
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    AsyncValue status = ref.watch(checkLoginStatusProvider);
-    AsyncValue tickets = ref.watch(getLoginTicketsProvider);
+    AsyncValue status = ref.watch(loginStatusProvider);
+    AsyncValue tickets = ref.watch(loginTicketsProvider);
 
     return Scaffold(
       appBar: AppBar(title: Text('我的')),
@@ -152,8 +152,8 @@ class LoginForm extends HookConsumerWidget {
                   passwordController.text,
                   codeController.text,
                 ).then((data) {
-                  ref.invalidate(checkLoginStatusProvider);
-                  ref.invalidate(getLoginTicketsProvider);
+                  ref.invalidate(loginStatusProvider);
+                  ref.invalidate(loginTicketsProvider);
                 });
               },
               child: Text("登！录！"),
