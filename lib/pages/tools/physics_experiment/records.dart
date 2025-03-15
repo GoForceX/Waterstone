@@ -53,7 +53,7 @@ class PhysicsExperimentRecordsPage extends ConsumerWidget {
                 const Text('获取实验列表失败', style: TextStyle(fontSize: 16)),
                 TextButton(
                   onPressed: () {
-                    ref.invalidate(prefetchSessionProvider);
+                    ref.invalidate(prefetchPhysicsExperimentSessionProvider);
                     ref.invalidate(getPhysicsExperimentRecordsProvider);
                   },
                   child: const Text('重试'),

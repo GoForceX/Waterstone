@@ -110,7 +110,7 @@ class PhysicsExperimentSchedulePage extends ConsumerWidget {
                 const Text('获取实验课表失败', style: TextStyle(fontSize: 16)),
                 TextButton(
                   onPressed: () {
-                    ref.invalidate(prefetchSessionProvider);
+                    ref.invalidate(prefetchPhysicsExperimentSessionProvider);
                     ref.invalidate(getPhysicsExperimentScheduleProvider);
                   },
                   child: const Text('重试'),

@@ -11,7 +11,7 @@ import '../../net.dart';
 part 'physics.g.dart';
 
 @riverpod
-Future<bool> prefetchSession(Ref ref) async {
+Future<bool> prefetchPhysicsExperimentSession(Ref ref) async {
   Dio dio = BaseSingleton.singleton.dio;
   Response resp = await dio.get(
     "http://empxk.hust.edu.cn/weixin/index",
@@ -28,7 +28,9 @@ Future<bool> prefetchSession(Ref ref) async {
 Future<List<PhysicsExperimentRecord>> getPhysicsExperimentRecords(
   Ref ref,
 ) async {
-  bool sessionStatus = await ref.watch(prefetchSessionProvider.future);
+  bool sessionStatus = await ref.watch(
+    prefetchPhysicsExperimentSessionProvider.future,
+  );
   if (!sessionStatus) {
     throw Exception("Failed to get physics experiment records");
   }
@@ -52,7 +54,9 @@ Future<List<PhysicsExperimentRecord>> getPhysicsExperimentRecords(
 Future<List<PhysicsExperimentAppointment>> getPhysicsExperimentSchedule(
   Ref ref,
 ) async {
-  bool sessionStatus = await ref.watch(prefetchSessionProvider.future);
+  bool sessionStatus = await ref.watch(
+    prefetchPhysicsExperimentSessionProvider.future,
+  );
   if (!sessionStatus) {
     throw Exception("Failed to get physics schedules");
   }
