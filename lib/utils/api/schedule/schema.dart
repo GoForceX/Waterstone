@@ -1,36 +1,51 @@
-class ClassScheduleHubs {
-  ClassScheduleHubs({
+abstract class ClassSchedule {
+  ClassSchedule({
+    this.startLessonIndex,
     this.endLessonIndex,
-    this.targetGrade,
-    this.classID,
     this.courseName,
     this.startWeek,
-    this.semesterID,
     this.endWeek,
-    this.teachingForm,
     this.weekday,
     this.lessonIndex,
-    this.className,
-    this.startLessonIndex,
     this.courseID,
     this.classroomName,
+  });
+
+  String? startLessonIndex;
+  String? endLessonIndex;
+  String? courseName;
+  int? startWeek;
+  int? endWeek;
+  String? weekday;
+  String? lessonIndex;
+  String? courseID;
+  String? classroomName;
+}
+
+class ClassScheduleHubs extends ClassSchedule {
+  ClassScheduleHubs({
+    super.endLessonIndex,
+    this.targetGrade,
+    this.classID,
+    super.courseName,
+    super.startWeek,
+    this.semesterID,
+    super.endWeek,
+    this.teachingForm,
+    super.weekday,
+    super.lessonIndex,
+    this.className,
+    super.startLessonIndex,
+    super.courseID,
+    super.classroomName,
     this.remarks,
   });
 
-  String? endLessonIndex;
   String? targetGrade;
   String? classID;
-  String? courseName;
-  int? startWeek;
   String? semesterID;
-  int? endWeek;
   String? teachingForm;
-  String? weekday;
-  String? lessonIndex;
   String? className;
-  String? startLessonIndex;
-  String? courseID;
-  String? classroomName;
   String? remarks;
 
   factory ClassScheduleHubs.fromJson(Map<String, dynamic> json) =>

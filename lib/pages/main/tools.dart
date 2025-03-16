@@ -15,6 +15,7 @@ class ToolRoute {
 
 final List<ToolRoute> toolRoutes = [
   ToolRoute(route: PhysicsExperimentRoute(), title: '大学物理实验'),
+  ToolRoute(route: ScheduleRoute(), title: '实时课程表'),
 ];
 
 @RoutePage()

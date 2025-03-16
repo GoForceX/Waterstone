@@ -69,6 +69,7 @@ class AppRouter extends RootStackRouter {
         AutoRoute(page: PhysicsExperimentScheduleRoute.page, path: 'schedule'),
       ],
     ),
+    AutoRoute(page: ScheduleRoute.page, path: '/tools/schedule'),
   ];
 }
 

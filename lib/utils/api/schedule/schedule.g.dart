@@ -27,7 +27,7 @@ final currentSemesterIDFromHubsProvider =
 // ignore: unused_element
 typedef CurrentSemesterIDFromHubsRef = AutoDisposeFutureProviderRef<String>;
 String _$hubsSemesterScheduleHash() =>
-    r'30a0c5319396d893e168c78c5131a20281df2807';
+    r'd62a12ac687f283528290056b93518dddf4cc0e8';
 
 /// Copied from Dart SDK
 class _SystemHash {
