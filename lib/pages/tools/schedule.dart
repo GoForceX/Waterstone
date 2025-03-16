@@ -38,36 +38,37 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('课程表')),
-      body: schedule.when(
-        data: (data) {
-          // Find the current week when data is loaded
-          _initCurrentWeek(data);
-          return _buildScheduleView(context, data);
-        },
-        error: (err, stack) {
-          logger.e(err);
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 48, color: Colors.red),
-                const SizedBox(height: 16),
-                const Text('获取课表失败', style: TextStyle(fontSize: 16)),
-                TextButton(
-                  onPressed: () {
-                    ref.invalidate(hubsSessionStatusProvider);
-                    ref.invalidate(hubsSemesterScheduleProvider);
-                  },
-                  child: const Text('重试'),
-                ),
-              ],
-            ),
-          );
-        },
-        loading: () {
-          return const Center(child: CircularProgressIndicator());
-        },
+      body: SafeArea(
+        child: schedule.when(
+          data: (data) {
+            // Find the current week when data is loaded
+            _initCurrentWeek(data);
+            return _buildScheduleView(context, data);
+          },
+          error: (err, stack) {
+            logger.e(err);
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error_outline, size: 48, color: Colors.red),
+                  const SizedBox(height: 16),
+                  const Text('获取课表失败', style: TextStyle(fontSize: 16)),
+                  TextButton(
+                    onPressed: () {
+                      ref.invalidate(hubsSessionStatusProvider);
+                      ref.invalidate(hubsSemesterScheduleProvider);
+                    },
+                    child: const Text('重试'),
+                  ),
+                ],
+              ),
+            );
+          },
+          loading: () {
+            return const Center(child: CircularProgressIndicator());
+          },
+        ),
       ),
     );
   }

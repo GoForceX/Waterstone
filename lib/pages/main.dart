@@ -10,10 +10,7 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AutoTabsScaffold(
-      routes: [
-        ToolsRoute(),
-        UserRoute(),
-      ],
+      routes: [ScheduleRoute(), ToolsRoute(), UserRoute()],
       bottomNavigationBuilder: (_, tabsRouter) {
         return BottomNavigationBar(
           iconSize: 32,
@@ -21,13 +18,11 @@ class MainPage extends StatelessWidget {
           unselectedFontSize: 15,
           items: const [
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: '应用',
+              icon: Icon(Icons.calendar_month),
+              label: '课表',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: '我的',
-            ),
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: '应用'),
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: '我的'),
           ],
           currentIndex: tabsRouter.activeIndex,
           onTap: tabsRouter.setActiveIndex,
