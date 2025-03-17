@@ -62,5 +62,23 @@ final hubsSessionStatusProvider = AutoDisposeFutureProvider<bool>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef HubsSessionStatusRef = AutoDisposeFutureProviderRef<bool>;
+String _$hubmSessionStatusHash() => r'1a4794a88d4499930e27b2d9d394fa438aaad9ae';
+
+/// See also [hubmSessionStatus].
+@ProviderFor(hubmSessionStatus)
+final hubmSessionStatusProvider = AutoDisposeFutureProvider<bool>.internal(
+  hubmSessionStatus,
+  name: r'hubmSessionStatusProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product')
+          ? null
+          : _$hubmSessionStatusHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef HubmSessionStatusRef = AutoDisposeFutureProviderRef<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

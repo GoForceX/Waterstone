@@ -33,16 +33,15 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
 
   @override
   Widget build(BuildContext context) {
-    AsyncValue<List<WeeklyScheduleHubs>> schedule = ref.watch(
-      hubsSemesterScheduleProvider(null),
-    );
+    // Use getAllScheduleProvider to get combined schedule
+    AsyncValue<WeeklySchedule> schedule = ref.watch(getAllScheduleProvider);
 
     return Scaffold(
       body: SafeArea(
         child: schedule.when(
           data: (data) {
             // Find the current week when data is loaded
-            _initCurrentWeek(data);
+            _initCurrentWeek(data.hubsSchedules);
             return _buildScheduleView(context, data);
           },
           error: (err, stack) {
@@ -57,7 +56,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
                   TextButton(
                     onPressed: () {
                       ref.invalidate(hubsSessionStatusProvider);
-                      ref.invalidate(hubsSemesterScheduleProvider);
+                      ref.invalidate(getAllScheduleProvider);
                     },
                     child: const Text('重试'),
                   ),
@@ -73,7 +72,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     );
   }
 
-  // Add this method to find the current week
+  // Update the method to accept WeeklyScheduleHubs list
   void _initCurrentWeek(List<WeeklyScheduleHubs> weeklySchedules) {
     if (weeklySchedules.isEmpty || _pageController.hasClients) {
       return;
@@ -107,10 +106,9 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     });
   }
 
-  Widget _buildScheduleView(
-    BuildContext context,
-    List<WeeklyScheduleHubs> weeklySchedules,
-  ) {
+  // Update the method to accept the new WeeklySchedule type
+  Widget _buildScheduleView(BuildContext context, WeeklySchedule schedule) {
+    List<WeeklyScheduleHubs> weeklySchedules = schedule.hubsSchedules;
     // If no data, show a message
     if (weeklySchedules.isEmpty) {
       return const Center(child: Text('没有课表数据'));
@@ -167,7 +165,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
               });
             },
             itemBuilder: (context, index) {
-              return _buildSchedulePageContent(context, weeklySchedules[index]);
+              // Pass both the WeeklyScheduleHubs and the relevant EPIC courses
+              return _buildSchedulePageContent(
+                context,
+                weeklySchedules[index],
+                schedule.epicSchedules,
+                weeklySchedules[index].weekIndex ?? 0,
+              );
             },
           ),
         ),
@@ -175,17 +179,20 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     );
   }
 
+  // Update to include EPIC schedules for the current week
   Widget _buildSchedulePageContent(
     BuildContext context,
-    WeeklyScheduleHubs schedule,
+    WeeklyScheduleHubs hubsSchedule,
+    List<ClassScheduleEPIC> epicSchedules,
+    int weekIndex,
   ) {
     final dayLabels = ['一', '二', '三', '四', '五', '六', '日'];
 
     // Parse start date of the week to generate individual dates
     DateTime? startDate;
     try {
-      if (schedule.startDate != null) {
-        startDate = DateTime.parse(schedule.startDate!);
+      if (hubsSchedule.startDate != null) {
+        startDate = DateTime.parse(hubsSchedule.startDate!);
       }
     } catch (e) {
       logger.e("Error parsing date: ${e.toString()}");
@@ -195,13 +202,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
       children: [
         // Fixed day header row
         Container(
-          color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+          color: Theme.of(context).primaryColor.withAlpha(25),
           child: Column(
             children: [
               // Date row
               Row(
                 children: [
-                  SizedBox(
+                  const SizedBox(
                     width: 40, // Width for time column
                   ),
                   ...List.generate(7, (index) {
@@ -317,29 +324,42 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
 
                   // Days columns
                   ...List.generate(7, (dayIndex) {
-                    List<ClassScheduleHubs>? dayClasses;
+                    // Get HUBS classes for this day
+                    List<ClassScheduleHubs>? dayHubsClasses;
                     switch (dayIndex) {
                       case 0:
-                        dayClasses = schedule.monday;
+                        dayHubsClasses = hubsSchedule.monday;
                         break;
                       case 1:
-                        dayClasses = schedule.tuesday;
+                        dayHubsClasses = hubsSchedule.tuesday;
                         break;
                       case 2:
-                        dayClasses = schedule.wednesday;
+                        dayHubsClasses = hubsSchedule.wednesday;
                         break;
                       case 3:
-                        dayClasses = schedule.thursday;
+                        dayHubsClasses = hubsSchedule.thursday;
                         break;
                       case 4:
-                        dayClasses = schedule.friday;
+                        dayHubsClasses = hubsSchedule.friday;
                         break;
                       case 5:
-                        dayClasses = schedule.saturday;
+                        dayHubsClasses = hubsSchedule.saturday;
                         break;
                       case 6:
-                        dayClasses = schedule.sunday;
+                        dayHubsClasses = hubsSchedule.sunday;
                         break;
+                      default:
+                        dayHubsClasses = null;
+                    }
+
+                    // Get EPIC classes for this day and week
+                    List<ClassScheduleEPIC> dayEpicClasses = [];
+                    for (var epicClass in epicSchedules) {
+                      if ((epicClass.startWeek == weekIndex ||
+                              epicClass.endWeek == weekIndex) &&
+                          epicClass.weekday == (dayIndex + 1).toString()) {
+                        dayEpicClasses.add(epicClass);
+                      }
                     }
 
                     return Expanded(
@@ -358,7 +378,13 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
                           ),
                         ),
                         child: Stack(
-                          children: _buildClassesForDay(context, dayClasses),
+                          children: [
+                            ...(_buildClassesForDay(context, dayHubsClasses)),
+                            ...(_buildEpicClassesForDay(
+                              context,
+                              dayEpicClasses,
+                            )),
+                          ],
                         ),
                       ),
                     );
@@ -372,6 +398,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     );
   }
 
+  // Keep existing method for HUBS classes
   List<Widget> _buildClassesForDay(
     BuildContext context,
     List<ClassScheduleHubs>? classes,
@@ -418,6 +445,51 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
     return widgets;
   }
 
+  // Add new method for EPIC classes
+  List<Widget> _buildEpicClassesForDay(
+    BuildContext context,
+    List<ClassScheduleEPIC> classes,
+  ) {
+    if (classes.isEmpty) {
+      return [];
+    }
+
+    List<Widget> widgets = [];
+
+    for (var classItem in classes) {
+      if (classItem.startLessonIndex == null ||
+          classItem.endLessonIndex == null) {
+        continue;
+      }
+
+      int startSlot = (int.tryParse(classItem.startLessonIndex!) ?? 1) - 1;
+      int spanCount =
+          (int.tryParse(classItem.endLessonIndex!) ?? 0) -
+          (int.tryParse(classItem.startLessonIndex!) ?? 0) +
+          1;
+
+      // Some validation to avoid layout issues
+      if (startSlot < 0) startSlot = 0;
+      if (startSlot >= 12) continue; // Out of our display range
+      if (startSlot + spanCount > 12) spanCount = 12 - startSlot;
+
+      widgets.add(
+        Positioned(
+          top: startSlot * _slotHeight,
+          left: 0,
+          right: 0,
+          height: spanCount * _slotHeight,
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
+            child: _buildEpicClassCard(context, classItem),
+          ),
+        ),
+      );
+    }
+
+    return widgets;
+  }
+
   Widget _buildClassCard(BuildContext context, ClassScheduleHubs classItem) {
     final theme = Theme.of(context);
 
@@ -439,10 +511,7 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
       color: cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
-        side: BorderSide(
-          color: theme.primaryColor.withValues(alpha: 0.3),
-          width: 0.5,
-        ),
+        side: BorderSide(color: theme.primaryColor.withAlpha(75), width: 0.5),
       ),
       elevation: 0,
       child: Padding(
@@ -476,6 +545,71 @@ class _SchedulePageState extends ConsumerState<SchedulePage> {
                 const Text(
                   '',
                   style: TextStyle(fontSize: 9, color: Colors.black54),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // Add new card builder for EPIC classes
+  Widget _buildEpicClassCard(
+    BuildContext context,
+    ClassScheduleEPIC classItem,
+  ) {
+    final theme = Theme.of(context);
+
+    // Use a different color scheme for EPIC classes
+    final int hashCode = classItem.courseName?.hashCode ?? 0;
+    final List<Color> colors = [
+      Colors.pink.shade100,
+      Colors.indigo.shade100,
+      Colors.deepPurple.shade100,
+      Colors.lime.shade100,
+      Colors.brown.shade100,
+      Colors.deepOrange.shade100,
+      Colors.lightBlue.shade100,
+    ];
+    final Color cardColor = colors[hashCode.abs() % colors.length];
+
+    return Card(
+      margin: EdgeInsets.zero,
+      color: cardColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+        side: BorderSide(color: theme.primaryColor.withAlpha(75), width: 0.5),
+      ),
+      elevation: 0,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2.0, horizontal: 4.0),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final double availableHeight = constraints.maxHeight;
+            final int maxLines = ((availableHeight - 14) / 12).floor();
+            final int mainTextLines = maxLines > 2 ? maxLines - 1 : 1;
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    '${classItem.courseName ?? '未知课程'}${classItem.classroomName != null ? '\n@${classItem.classroomName}' : ''}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 10,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: mainTextLines,
+                  ),
+                ),
+                Text(
+                  classItem.teacherName ?? '',
+                  style: const TextStyle(fontSize: 9, color: Colors.black54),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

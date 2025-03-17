@@ -48,3 +48,17 @@ Future<bool> hubsSessionStatus(Ref ref) async {
   }
   return false;
 }
+
+@riverpod
+Future<bool> hubmSessionStatus(Ref ref) async {
+  Dio dio = BaseSingleton.singleton.dio;
+  Response resp = await dio.get(
+    "http://hub.m.hust.edu.cn/hub_weix/menuPage.do?CDBH=9128",
+    options: Options(validateStatus: (statusCode) => true),
+  );
+  resp = await followRedirects(resp);
+  if (resp.realUri.toString().startsWith("http://hub.m.hust.edu.cn")) {
+    return true;
+  }
+  return false;
+}

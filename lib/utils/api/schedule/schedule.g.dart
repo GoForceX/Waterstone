@@ -6,28 +6,29 @@ part of 'schedule.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$currentSemesterIDFromHubsHash() =>
-    r'7a2fde28af24d0e175288e91a11ba1e6ee0b8b66';
+String _$currentSemesterTimeInfoFromHubsHash() =>
+    r'953445d6c263a986d66ee66e6cf1d2f2f805fb9a';
 
-/// See also [currentSemesterIDFromHubs].
-@ProviderFor(currentSemesterIDFromHubs)
-final currentSemesterIDFromHubsProvider =
-    AutoDisposeFutureProvider<String>.internal(
-      currentSemesterIDFromHubs,
-      name: r'currentSemesterIDFromHubsProvider',
+/// See also [currentSemesterTimeInfoFromHubs].
+@ProviderFor(currentSemesterTimeInfoFromHubs)
+final currentSemesterTimeInfoFromHubsProvider =
+    AutoDisposeFutureProvider<SemesterTimeInfo>.internal(
+      currentSemesterTimeInfoFromHubs,
+      name: r'currentSemesterTimeInfoFromHubsProvider',
       debugGetCreateSourceHash:
           const bool.fromEnvironment('dart.vm.product')
               ? null
-              : _$currentSemesterIDFromHubsHash,
+              : _$currentSemesterTimeInfoFromHubsHash,
       dependencies: null,
       allTransitiveDependencies: null,
     );
 
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
-typedef CurrentSemesterIDFromHubsRef = AutoDisposeFutureProviderRef<String>;
+typedef CurrentSemesterTimeInfoFromHubsRef =
+    AutoDisposeFutureProviderRef<SemesterTimeInfo>;
 String _$hubsSemesterScheduleHash() =>
-    r'd62a12ac687f283528290056b93518dddf4cc0e8';
+    r'544423d892993928b2492a1a7a4e2ace43c46274';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -177,5 +178,44 @@ class _HubsSemesterScheduleProviderElement
   String? get semesterID => (origin as HubsSemesterScheduleProvider).semesterID;
 }
 
+String _$epicClassScheduleHash() => r'8249fc9c5a99b846410c21d1477137107a11ac14';
+
+/// See also [epicClassSchedule].
+@ProviderFor(epicClassSchedule)
+final epicClassScheduleProvider =
+    AutoDisposeFutureProvider<List<ClassScheduleEPIC>>.internal(
+      epicClassSchedule,
+      name: r'epicClassScheduleProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$epicClassScheduleHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef EpicClassScheduleRef =
+    AutoDisposeFutureProviderRef<List<ClassScheduleEPIC>>;
+String _$getAllScheduleHash() => r'70d1144b30f1a635ebddf05a60a69127aace08f5';
+
+/// See also [getAllSchedule].
+@ProviderFor(getAllSchedule)
+final getAllScheduleProvider =
+    AutoDisposeFutureProvider<WeeklySchedule>.internal(
+      getAllSchedule,
+      name: r'getAllScheduleProvider',
+      debugGetCreateSourceHash:
+          const bool.fromEnvironment('dart.vm.product')
+              ? null
+              : _$getAllScheduleHash,
+      dependencies: null,
+      allTransitiveDependencies: null,
+    );
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GetAllScheduleRef = AutoDisposeFutureProviderRef<WeeklySchedule>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
